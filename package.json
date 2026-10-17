@@ -1,0 +1,25 @@
+﻿{
+    "name":  "finpilot-ai",
+    "private":  true,
+    "version":  "1.0.0",
+    "engines":  {
+                    "node":  "22.x"
+                },
+    "workspaces":  [
+                       "frontend",
+                       "backend"
+                   ],
+    "scripts":  {
+                    "dev":  "concurrently -k -n frontend,backend -c cyan,green \"npm:dev:frontend\" \"npm:dev:backend\"",
+                    "dev:frontend":  "npm --workspace frontend run dev",
+                    "dev:backend":  "npm --workspace backend run dev",
+                    "build":  "npm --workspace frontend run build \u0026\u0026 npm --workspace backend run build",
+                    "test:frontend":  "npm --workspace frontend test",
+                    "test:backend":  "npm --workspace backend test",
+                    "test":  "npm run test:frontend \u0026\u0026 npm run test:backend",
+                    "test:analytics":  "py -m pytest analytics/tests"
+                },
+    "devDependencies":  {
+                            "concurrently":  "^9.1.2"
+                        }
+}

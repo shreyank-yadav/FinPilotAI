@@ -1,0 +1,15 @@
+import { FormEvent, useState } from 'react';
+import { Download, ShieldCheck } from 'lucide-react';
+
+export function SettingsPage({mode,userName,onSaveProfile,onExport,onAdvisor}:{mode:'demo'|'account';userName:string;onSaveProfile:(name:string)=>Promise<void>;onExport:()=>void;onAdvisor:()=>void}) {
+  const [name,setName]=useState(userName),[busy,setBusy]=useState(false),[message,setMessage]=useState(''),[error,setError]=useState('');
+  const submit=async(event:FormEvent<HTMLFormElement>)=>{event.preventDefault();const value=name.trim();if(!value||value.length>80){setError('Enter a name between 1 and 80 characters.');return;}setBusy(true);setError('');setMessage('');try{await onSaveProfile(value);setMessage('Profile name updated.');}catch(reason){setError(reason instanceof Error?reason.message:'Could not update your profile.');}finally{setBusy(false);}};
+  return <section className="card settings-card"><h2>Settings & profile</h2><p>Manage your FinPilot {mode==='account'?'account':'demo'} workspace and data preferences.</p>
+    <div className="settings-row"><div><b>Profile</b><small>{mode==='account'?`${userName} · India · INR`:'Synthetic demo profile · India · INR'}</small></div>{mode==='account'?<form className="profile-form" onSubmit={submit}><label className="sr-only" htmlFor="profile-name">Profile name</label><input id="profile-name" value={name} maxLength={80} onChange={event=>setName(event.target.value)}/><button className="outline-button" type="submit" disabled={busy}>{busy?'Saving…':'Save name'}</button>{error&&<small className="form-error" role="alert">{error}</small>}{message&&<small role="status">{message}</small>}</form>:<span className="muted-text">Demo profile editing is unavailable.</span>}</div>
+    <div className="settings-row"><div><b>Data privacy</b><small>{mode==='account'?'Account records are isolated by your login and stored in MongoDB. No bank account is linked.':'Demo data is stored separately in this browser. No bank account is connected.'}</small></div><span className="demo-pill"><i/> Protected</span></div>
+    <div className="settings-row"><div><b>Export your data</b><small>Download only the financial records currently shown in this {mode==='account'?'account':'demo'} workspace.</small></div><button className="outline-button" onClick={onExport}><Download size={15}/> Export JSON</button></div>
+    <div className="settings-row"><div><b>CSV import</b><small>Import preview and confirmation are not available in the interface yet.</small></div><span className="muted-text">Unavailable</span></div>
+    <div className="settings-row"><div><b>AI provider</b><small>Configure the provider and API key on the backend. Keys are never stored in this browser.</small></div><button className="outline-button" onClick={onAdvisor}>Advisor status</button></div>
+    <p className="advice-note"><ShieldCheck size={15}/> This app does not claim encryption at rest or end-to-end encryption. Use a secured MongoDB deployment and HTTPS in production.</p>
+  </section>;
+}

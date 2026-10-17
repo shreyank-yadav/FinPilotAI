@@ -1,0 +1,12 @@
+node_modules/
+frontend/dist/
+backend/dist/
+analytics/.venv/
+analytics/__pycache__/
+analytics/.pytest_cache/
+.env
+**/.env
+*.log
+
+__pycache__/
+*.py[cod]
