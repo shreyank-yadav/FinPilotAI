@@ -11,6 +11,7 @@ import { buildTopSpendingAnswer, indiaMonth as advisorIndiaMonth, summarizeAdvis
 import { ADVISOR_OUT_OF_SCOPE_REPLY, isAdvisorQuestionInScope } from './advisorScope.js';
 
 const app=express();
+app.set("trust proxy", 1);
 app.use(helmet());
 const frontendOrigins=process.env.FRONTEND_ORIGIN?.split(',').map(origin=>origin.trim()).filter(Boolean);
 app.use(cors({origin:frontendOrigins?.length?frontendOrigins:(process.env.NODE_ENV==='production'?false:'http://localhost:5173'),credentials:true}));
