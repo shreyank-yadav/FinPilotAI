@@ -1,7 +1,15 @@
 import type { DemoAsset, DemoData, DemoLiability } from './demoStore';
 
 export const AUTH_STORAGE_KEY = 'finpilot-account-session.v1';
-const API_BASE = import.meta.env?.VITE_API_BASE_URL || 'http://localhost:4000';
+const DEVELOPMENT_API_URL = 'http://localhost:4000';
+const PRODUCTION_API_URL = 'https://finpilotai-b62i.onrender.com';
+
+export function resolveApiBase(configuredApiUrl: string | undefined, isDevelopment: boolean): string {
+  const fallback = isDevelopment ? DEVELOPMENT_API_URL : PRODUCTION_API_URL;
+  return (configuredApiUrl?.trim() || fallback).replace(/\/+$/, '').replace(/\/api$/i, '');
+}
+
+const API_BASE = resolveApiBase(import.meta.env?.VITE_API_URL, import.meta.env?.DEV ?? false);
 
 export interface AccountUser { id: string; name: string; email: string }
 export interface AccountSession { token: string; user: AccountUser }

@@ -1,12 +1,20 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { AUTH_STORAGE_KEY, clearSession, exportAccountData, getSavedSessionToken, loginAccount, registerAccount, restoreAccount, saveSession, type AuthStorage } from './authService.ts';
+import { AUTH_STORAGE_KEY, clearSession, exportAccountData, getSavedSessionToken, loginAccount, registerAccount, resolveApiBase, restoreAccount, saveSession, type AuthStorage } from './authService.ts';
 
 function memoryStorage(): AuthStorage {
   const values = new Map<string, string>();
   return { getItem: key => values.get(key) ?? null, setItem: (key, value) => { values.set(key, value); }, removeItem: key => { values.delete(key); } };
 }
 const reply = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
+
+test('API base honors VITE_API_URL, removes a trailing /api, and uses safe environment fallbacks', () => {
+  assert.equal(resolveApiBase(' https://finpilotai-b62i.onrender.com/ ', false), 'https://finpilotai-b62i.onrender.com');
+  assert.equal(resolveApiBase('https://finpilotai-b62i.onrender.com/api/', false), 'https://finpilotai-b62i.onrender.com');
+  assert.equal(`${resolveApiBase('https://finpilotai-b62i.onrender.com/api/', false)}/api/auth/login`, 'https://finpilotai-b62i.onrender.com/api/auth/login');
+  assert.equal(resolveApiBase(undefined, true), 'http://localhost:4000');
+  assert.equal(resolveApiBase(undefined, false), 'https://finpilotai-b62i.onrender.com');
+});
 
 test('registration and login save the returned account session', async () => {
   const verifySavedSession = async (invoke: (storage: AuthStorage) => Promise<{ token: string; user: { id: string; name: string; email: string } }>) => {
